@@ -117,6 +117,8 @@
 - **ACME**: acme plugin now supports configuring `namespace` for redis storage
   which is default to empty string for backward compatibility.
   [#10562](https://github.com/Kong/kong/pull/10562)
+- **AWS Lambda**: add a new field `disable_https` to support scheme config on lambda service api endpoint
+  [#9799](https://github.com/Kong/kong/pull/9799)
 
 #### PDK
 
