@@ -118,6 +118,8 @@
 - Fixed an issue where dangling Unix sockets would prevent Kong from restarting in
   Docker containers if it was not cleanly stopped.
   [#10468](https://github.com/Kong/kong/pull/10468)
+- Prevent CA certificate to be deleted that utilized by other entities.
+  [#10120](https://github.com/Kong/kong/pull/10120)
 
 ### Changed
 
