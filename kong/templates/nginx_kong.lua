@@ -440,7 +440,6 @@ server {
 }
 > end -- role == "control_plane"
 
-> if not legacy_worker_events then
 server {
     charset UTF-8;
     server_name kong_worker_events;
@@ -452,5 +451,4 @@ server {
         }
     }
 }
-> end -- not legacy_worker_events
 ]]

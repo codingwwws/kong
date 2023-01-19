@@ -1,7 +1,9 @@
 local utils = require "kong.tools.utils"
 local mocker = require "spec.fixtures.mocker"
 
+
 local ws_id = utils.uuid()
+
 
 local function setup_it_block(consistency)
   local cache_table = {}
@@ -35,7 +37,6 @@ local function setup_it_block(consistency)
       configuration = {
         worker_consistency = consistency,
         worker_state_update_frequency = 0.1,
-        legacy_worker_events = "on",
       },
       core_cache = mock_cache(cache_table),
     },
@@ -47,21 +48,18 @@ local function setup_it_block(consistency)
   })
 end
 
+
 local function setup_kong(fixtures)
   local kong = {}
 
   _G.kong = kong
 
-  kong.worker_events = require "resty.worker.events"
+  kong.worker_events = require "resty.events.compat"
   kong.db = {}
 
   kong.worker_events.configure({
-    shm = "kong_process_events", -- defined by "lua_shared_dict"
-    timeout = 5,            -- life time of event data in shm
-    interval = 1,           -- poll interval (seconds)
-
-    wait_interval = 0.010,  -- wait before retry fetching event data
-    wait_max = 0.5,         -- max wait time before discarding event
+    listening = "unix:",
+    testing = true,
   })
 
   local function each(fixture)
@@ -126,6 +124,7 @@ local function setup_kong(fixtures)
   return kong
 end
 
+
 for _, consistency in ipairs({"strict", "eventual"}) do
   describe("Balancer (worker_consistency = " .. consistency .. ")", function()
     local balancer
@@ -138,7 +137,6 @@ for _, consistency in ipairs({"strict", "eventual"}) do
     lazy_teardown(function()
       ngx.log:revert() -- luacheck: ignore
     end)
-
 
     lazy_setup(function()
       stub(ngx, "log")
@@ -348,7 +346,6 @@ for _, consistency in ipairs({"strict", "eventual"}) do
 
       balancers.init()
       healthcheckers.init()
-
     end)
 
     describe("create_balancer()", function()
@@ -442,10 +439,6 @@ for _, consistency in ipairs({"strict", "eventual"}) do
 
     describe("get_upstream_by_name()", function()
       it("retrieves a complete upstream based on its name", function()
-        setup_kong({
-          targets = TARGETS_FIXTURES,
-          upstreams = UPSTREAMS_FIXTURES,
-        })
         setup_it_block(consistency)
         for _, fixture in ipairs(UPSTREAMS_FIXTURES) do
           local upstream = balancer.get_upstream_by_name(fixture.name)
@@ -560,6 +553,5 @@ for _, consistency in ipairs({"strict", "eventual"}) do
         assert.same(nil, data[3])
       end)
     end)
-
   end)
 end
