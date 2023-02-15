@@ -5,6 +5,7 @@
 local utils = require "kong.tools.utils"
 local ffi = require "ffi"
 local private_node = require "kong.pdk.private.node"
+local lmdb = require "resty.lmdb"
 
 
 local floor = math.floor
@@ -18,6 +19,7 @@ local shared = ngx.shared
 local C             = ffi.C
 local ffi_new       = ffi.new
 local ffi_str       = ffi.string
+local lmdb_info     = lmdb.get_env_info
 
 local NODE_ID_KEY = "kong:node_id"
 
@@ -227,6 +229,20 @@ local function new(self)
         capacity = convert_bytes(shm.capacity, unit, scale),
         allocated_slabs = convert_bytes(allocated, unit, scale),
       }
+    end
+
+    if kong.configuration.database == "off" then
+      local lmdb_info, err = lmdb_info()
+      if err then
+        res.lmdb = self.table.new(0, 1)
+        res.lmdb.err = "could not get kong lmdb status: " .. err
+      else
+        res.lmdb = lmdb_info
+        res.lmdb.max_map_size = convert_bytes(lmdb_info.max_map_size, unit, scale)
+        res.lmdb.map_size = convert_bytes(lmdb_info.map_size, unit, scale)
+        res.lmdb.used_size = convert_bytes(lmdb_info.used_pages * lmdb_info.page_size, unit, scale)
+        res.lmdb.page_size = convert_bytes(lmdb_info.page_size, "k", scale)
+      end
     end
 
     return res
