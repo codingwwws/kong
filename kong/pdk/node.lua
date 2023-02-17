@@ -231,7 +231,7 @@ local function new(self)
       }
     end
 
-    if kong.configuration.database == "off" then
+    if kong and kong.configuration and kong.configuration.database == "off" then
       local lmdb_info, err = lmdb_info()
       if err then
         res.lmdb = self.table.new(0, 1)
