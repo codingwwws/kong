@@ -157,11 +157,6 @@ local function init()
     memory_stats.shm_capacity:set(value.capacity, { node_id, shm_name, kong_subsystem })
   end
 
-  if kong.configuration.database == "off" then
-    memory_stats.lmdb_capacity:set(res.lmdb.map_size, { node_id, kong_subsystem })
-    memory_stats.lmdb:set(res.lmdb.used_size, { node_id, kong_subsystem })
-  end
-
   metrics.memory_stats = memory_stats
 
   -- per service/route
