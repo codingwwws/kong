@@ -16,7 +16,7 @@ local ipairs = ipairs
 local tonumber = tonumber
 local knode = kong and kong.node or require "kong.pdk.node".new()
 local null = ngx.null
-local lmdb_info     = lmdb.get_env_info
+local lmdb_info = lmdb.get_env_info
 
 local queues = {}
 
@@ -320,6 +320,7 @@ if ngx.config.ngx_lua_version >= 10011 then
           logger:send_statsd("lmdb.capacity",
             lmdb_info.map_size, logger.stat_types.gauge,
             metric_config.sample_rate)
+
         else
           logger:send_statsd(string_format("node.%s.lmdb.used_space", hostname),
             lmdb_info.used_pages * lmdb_info.page_size, logger.stat_types.gauge,

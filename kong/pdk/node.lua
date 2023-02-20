@@ -123,7 +123,19 @@ local function new(self)
   --       http_allocated_gc = 1102,
   --       pid = 18005
   --     }
-  --   }
+  --   },
+  --   -- if the `kong` use dbless mode, the following will be present:
+  --  lmdb = {
+  --    max_map_size: 128.00 MiB",
+  --    map_size: "128.00 MiB",
+  --    used_size": "0.02 MiB",
+  --    used_pages": 6,
+  --    max_pages": 32768,
+  --    last_txnid": 2,
+  --    max_readers": 126,
+  --    num_readers": 16
+  --   },
+  --}
   -- }
   --
   -- local res = kong.node.get_memory_stats("k", 1)
@@ -149,6 +161,17 @@ local function new(self)
   --       pid = 18005
   --     }
   --   }
+  --   -- if the `kong` use dbless mode, the following will be present:
+  --  lmdb = {
+  --    max_map_size: "131072 KB",
+  --    map_size: "131072 KB",
+  --    used_size": "20.48 KB",
+  --    used_pages": 6,
+  --    max_pages": 32768,
+  --    last_txnid": 2,
+  --    max_readers": 126,
+  --    num_readers": 16
+  --   },
   -- }
   function _NODE.get_memory_stats(unit, scale)
     -- validate arguments
@@ -236,12 +259,13 @@ local function new(self)
       if err then
         res.lmdb = self.table.new(0, 1)
         res.lmdb.err = "could not get kong lmdb status: " .. err
+
       else
+        lmdb_info.max_map_size = convert_bytes(lmdb_info.max_map_size, unit, scale)
+        lmdb_info.map_size = convert_bytes(lmdb_info.map_size, unit, scale)
+        lmdb_info.used_size = convert_bytes(lmdb_info.used_pages * lmdb_info.page_size, unit, scale)
+        lmdb_info.page_size = nil
         res.lmdb = lmdb_info
-        res.lmdb.max_map_size = convert_bytes(lmdb_info.max_map_size, unit, scale)
-        res.lmdb.map_size = convert_bytes(lmdb_info.map_size, unit, scale)
-        res.lmdb.used_size = convert_bytes(lmdb_info.used_pages * lmdb_info.page_size, unit, scale)
-        res.lmdb.page_size = convert_bytes(lmdb_info.page_size, "k", scale)
       end
     end
 
