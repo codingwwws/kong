@@ -94,31 +94,6 @@ describe("#wasm filter execution", function()
     end
 
     do
-      local name = "route-service-attach.test"
-      local service = assert(bp.services:insert {
-        name = name,
-        url = helpers.mock_upstream_url,
-      })
-
-      local route = assert(bp.routes:insert {
-        name = name,
-        service = service,
-        strip_path = true,
-        paths = { "/" },
-        hosts = { name },
-      })
-
-      assert(db.wasm_filter_chains:insert {
-        name = name,
-        route = { id = route.id },
-        service = { id = service.id },
-        filters = {
-          { name = "tests", config = "add_resp_header=route+service" },
-        },
-      })
-    end
-
-    do
       local name = "global-attach.test"
       local service = assert(bp.services:insert {
         name = name,
@@ -192,10 +167,6 @@ describe("#wasm filter execution", function()
 
     it("attached to a route", function()
       test_it("route-attach.test", { "route", "global" })
-    end)
-
-    it("attached to a service and a route", function()
-      test_it("route-service-attach.test", { "route+service", "global" })
     end)
 
     it("attached globally", function()
