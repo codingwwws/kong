@@ -109,7 +109,7 @@ for _, strategy in helpers.each_strategy() do
               local res = httpc:get("/")
               assert(res.status == 200)
               httpc:close()
-            end)
+            end, nil, nil, "kong responds to proxy traffic after restart")
           end)
         end
 
@@ -611,19 +611,75 @@ describe("helpers: utilities", function()
         end, 3)
       end)
     end)
+
     it("errors out after delay", function()
       assert.error_matches(function()
         helpers.wait_until(function()
           return false, "thing still not done"
         end, 1)
-      end, "timeout: thing still not done")
+      end, "last_returned_error.*thing still not done")
     end)
-    it("reports errors in test function", function()
+
+    it("fails when test function throws an error()", function()
       assert.error_matches(function()
         helpers.wait_until(function()
-          assert.equal("foo", "bar")
+          error("oops")
         end, 1)
-      end, "Expected objects to be equal.", nil, true)
+      end, "error.*oops")
+    end)
+
+    it("fails when test function raised an assertion error", function()
+      assert.has_error(function()
+        helpers.wait_until(function()
+          assert.is_true(false)
+        end, 1)
+      end)
+    end)
+
+    it("can optionally ignore error()", function()
+      assert.has_no_error(function()
+        local i = 0
+        helpers.wait_until(function()
+          i = i + 1
+          if i < 10 then
+            error("i is less than 10")
+          end
+          return true
+        end, 1, nil, nil, true)
+      end)
+    end)
+
+    it("takes an optional condition string for context", function()
+      assert.error_matches(function()
+        helpers.wait_until(function()
+          return false
+        end, 0.1)
+      end, "condition.*UNSPECIFIED")
+
+      assert.error_matches(function()
+        helpers.wait_until(function()
+          return false
+        end, 0.1, nil, "the thing returns true")
+      end, "condition.*the thing returns true")
+    end)
+  end)
+
+  describe("pwait_until()", function()
+    it("behaves as wait_until() with ignore_errors = true", function()
+      assert.has_no_error(function()
+        local i = 0
+        helpers.pwait_until(function()
+          i = i + 1
+
+          if i < 5 then
+            error("i is less than 5")
+          end
+
+          assert.is_true(i > 6)
+
+          return true
+        end, 1)
+      end)
     end)
   end)
 

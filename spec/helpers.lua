@@ -1443,12 +1443,16 @@ local luassert = require "luassert.assert"
 -- @param timeout (optional) maximum time to wait after which an error is
 -- thrown, defaults to 5.
 -- @param step (optional) interval between checks, defaults to 0.05.
+-- @param condition (optional, string) a description of the condition that is
+-- being waited upon
+-- @param ignore_errors (optional, boolean, default = false) if `true`, errors
+-- thrown by `f` will not exit early with failure
 -- @return nothing. It returns when the condition is met, or throws an error
 -- when it times out.
 -- @usage
 -- -- wait 10 seconds for a file "myfilename" to appear
 -- helpers.wait_until(function() return file_exist("myfilename") end, 10)
-local function wait_until(f, timeout, step)
+local function wait_until(f, timeout, step, condition, ignore_errors)
   if type(f) ~= "function" then
     error("arg #1 must be a function", 2)
   end
@@ -1470,23 +1474,54 @@ local function wait_until(f, timeout, step)
   local texp = tstart + timeout
   local ok, res, err
 
+  local state = {
+    action          = ignore_errors and "pwait_until()" or "wait_until()",
+    timeout         = timeout,
+    step            = step,
+    condition       = condition or "UNSPECIFIED",
+    tries           = 0,
+    error_raised    = false,
+    condition_met   = false,
+  }
+
   repeat
     ok, res, err = pcall(f)
+
+    state.tries = state.tries + 1
+
+    -- yay!
+    if ok and res then
+      state.condition_met = true
+      state.last_returned_value = res
+      break
+
+    -- non-truthy return value
+    elseif ok and not res then
+      state.last_returned_error = err or state.last_returned_error
+
+    -- error()
+    else
+      state.error_raised = true
+      state.error = res or "UNKNOWN"
+
+      if not ignore_errors then
+        break
+      end
+    end
+
     ngx.sleep(step)
     ngx.update_time()
-  until not ok or res or ngx.now() >= texp
 
-  if not ok then
-    -- report error from `f`, such as assert gone wrong
-    error(tostring(res), 2)
-  elseif not res and err then
-    -- report a failure for `f` to meet its condition
-    -- and eventually an error return value which could be the cause
-    error("wait_until() timeout: " .. tostring(err) .. " (after delay: " .. timeout .. "s)", 2)
-  elseif not res then
-    -- report a failure for `f` to meet its condition
-    error("wait_until() timeout (after delay " .. timeout .. "s)", 2)
-  end
+  until ngx.now() >= texp
+
+  ngx.update_time()
+  state.elapsed = ngx.now() - tstart
+
+  state.result = (state.condition_met and "success")
+              or (state.error_raised and "error")
+              or "timeout"
+
+  luassert.is_true(state.condition_met, state)
 end
 
 
@@ -1500,12 +1535,12 @@ end
 -- @param timeout (optional) maximum time to wait after which an error is
 -- thrown, defaults to 5.
 -- @param step (optional) interval between checks, defaults to 0.05.
+-- @param condition (optional, string) a description of the condition that is
+-- being waited upon
 -- @return nothing. It returns when the condition is met, or throws an error
 -- when it times out.
-local function pwait_until(f, timeout, step)
-  wait_until(function()
-    return pcall(f)
-  end, timeout, step)
+local function pwait_until(f, timeout, step, condition)
+  wait_until(f, timeout, step, condition, true)
 end
 
 --- Wait for some timers, throws an error on timeout.
