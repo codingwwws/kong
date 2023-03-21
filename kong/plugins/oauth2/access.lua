@@ -88,10 +88,6 @@ do
   end
 end
 
-local function get_plugin_identifier(conf)
-  return conf.__key__
-end
-
 
 local function generate_token(conf, service, credential, authenticated_userid,
                               scope, state, disable_refresh, existing_token)
@@ -370,7 +366,7 @@ local function authorize(conf)
             scope = scopes,
             challenge = challenge,
             challenge_method = challenge_method,
-            plugin_identifier = get_plugin_identifier(conf),
+            plugin_id = kong.plugin.get_id(),
           }, {
             ttl = 300
           })
@@ -649,8 +645,7 @@ local function issue_token(conf)
         end
 
         if not response_params[ERROR] and conf.global_credentials then
-          local expected_identifier = get_plugin_identifier(conf)
-          if expected_identifier ~= auth_code.plugin_identifier then
+          if kong.plugin.get_id() ~= auth_code.plugin_id then
             response_params = {
               [ERROR] = "invalid_request",
               error_description = "Invalid " .. CODE
