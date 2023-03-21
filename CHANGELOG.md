@@ -133,6 +133,11 @@
 - Fix an issue where empty value of URI argument `custom_id` crashes `/consumer`.
   [#10475](https://github.com/Kong/kong/pull/10475)
 
+#### Plugins
+
+- **Oauth2**: prevent an authorization code created by one plugin instance to be exchanged for an access token by a different plugin instance.
+  [#10011](https://github.com/Kong/kong/pull/10011)
+
 ### Changed
 
 #### Core
@@ -155,8 +160,6 @@
   The plugin will set the corresponding header in the response
   if the field is specified with a string value.
   [#10379](https://github.com/Kong/kong/pull/10379)
-- **Oauth2**: prevent an authorization code created by one plugin instance to be exchanged for an access token by a different plugin instance.
-  [#10011](https://github.com/Kong/kong/pull/10011)
 
 ### Dependencies
 
