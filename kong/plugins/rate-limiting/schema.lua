@@ -19,6 +19,16 @@ local function validate_periods_order(config)
     end
   end
 
+  if config.policy ~= "redis" and config.sync_rate ~= -1 then
+    return nil, "sync_rate can only be used with the redis policy"
+  end
+
+  if config.policy == "redis" then
+    if config.sync_rate ~= -1 and config.sync_rate < 0.02 then
+      return nil, "sync_rate must be greater than 0.02, or -1 to disable"
+    end
+  end
+
   return true
 end
 
@@ -93,6 +103,7 @@ return {
           { hide_client_headers = { type = "boolean", required = true, default = false }, },
           { error_code = {type = "number", default = 429, gt = 0 }, },
           { error_message = {type = "string", default = "API rate limit exceeded" }, },
+          { sync_rate = { type = "number", required = true, default = -1 }, },
         },
         custom_validator = validate_periods_order,
       },

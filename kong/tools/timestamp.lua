@@ -10,6 +10,8 @@ local tt_from_timestamp = luatz.timetable.new_from_timestamp
 local tt = luatz.timetable.new
 local math_floor = math.floor
 local tablex = require "pl.tablex"
+local os_time = os.time
+local os_date = os.date
 
 --- Current UTC time
 -- @return UTC time in milliseconds since epoch, but with SECOND precision.
@@ -44,26 +46,28 @@ end
 -- @param now (optional) Time to generate timestamps from, if omitted current UTC time will be used
 -- @return Timestamp table containing fields/precisions; second, minute, hour, day, month, year
 local function get_timestamps(now)
-  local timetable = get_timetable(now)
+  now = now or get_utc()
+
+  if now > ms_check then
+    now = now / 1000
+  end
+
+  local timetable = os_date("!*t", math_floor(now))
   local stamps = {}
 
-  timetable.sec = math_floor(timetable.sec)   -- reduce to second precision
-  stamps.second = timetable:timestamp() * 1000
+  stamps.second = os_time(timetable) * 1000
+
+  stamps.minute = stamps.second - timetable.sec * 1000
+  stamps.hour = stamps.minute - timetable.min * 60 * 1000
+  stamps.day = stamps.hour - timetable.hour * 60 * 60 * 1000
+  stamps.month = stamps.day - (timetable.day - 1) * 24 * 60 * 60 * 1000
 
   timetable.sec = 0
-  stamps.minute = timetable:timestamp() * 1000
-
   timetable.min = 0
-  stamps.hour = timetable:timestamp() * 1000
-
   timetable.hour = 0
-  stamps.day = timetable:timestamp() * 1000
-
   timetable.day = 1
-  stamps.month = timetable:timestamp() * 1000
-
   timetable.month = 1
-  stamps.year = timetable:timestamp() * 1000
+  stamps.year = os_time(timetable) * 1000
 
   return stamps
 end
