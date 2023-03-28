@@ -1,4 +1,4 @@
-local BatchQueue = require "kong.tools.batch_queue"
+local Queue = require "kong.tools.queue"
 local http = require "resty.http"
 local clone = require "table.clone"
 local otlp = require "kong.plugins.opentelemetry.otlp"
@@ -34,8 +34,6 @@ local default_headers = {
   ["Content-Type"] = "application/x-protobuf",
 }
 
--- worker-level spans queue
-local queues = {} -- one queue per unique plugin config
 local headers_cache = setmetatable({}, { __mode = "k" })
 
 
@@ -99,23 +97,6 @@ local function http_export(conf, spans)
   return ok, err
 end
 
-local function process_span(span, queue)
-  if span.should_sample == false or kong.ctx.plugin.should_sample == false then
-    -- ignore
-    return
-  end
-
-  -- overwrite
-  local trace_id = kong.ctx.plugin.trace_id
-  if trace_id then
-    span.trace_id = trace_id
-  end
-
-  local pb_span = encode_span(span)
-
-  queue:add(pb_span)
-end
-
 function OpenTelemetryHandler:access()
   local headers = ngx_get_headers()
   local root_span = ngx.ctx.KONG_SPANS and ngx.ctx.KONG_SPANS[1]
@@ -164,31 +145,48 @@ function OpenTelemetryHandler:header_filter(conf)
   end
 end
 
+local function get_queue_params(config)
+  local queue_config = unpack({ config.queue or {}})
+  if config.batch_span_count then
+    ngx.log(ngx.WARN, string.format(
+      "deprecated `batch_span_count` parameter in plugin %s converted to `queue.batch_max_size`",
+      kong.plugin.get_id()))
+    queue_config.batch_max_size = config.batch_span_count
+  end
+  if config.batch_flush_delay then
+    ngx.log(ngx.WARN, string.format(
+      "deprecated `batch_flush_delay` parameter in plugin %s converted to `queue.max_delay`",
+      kong.plugin.get_id()))
+    queue_config.max_delay = config.batch_flush_delay
+  end
+  if not queue_config.name then
+    queue_config.name = kong.plugin.get_id()
+  end
+  return queue_config
+end
+
 function OpenTelemetryHandler:log(conf)
   ngx_log(ngx_DEBUG, _log_prefix, "total spans in current request: ", ngx.ctx.KONG_SPANS and #ngx.ctx.KONG_SPANS)
 
-  local queue_id = kong.plugin.get_id()
-  local q = queues[queue_id]
-  if not q then
-    local process = function(entries)
-      return http_export(conf, entries)
-    end
-
-    local opts = {
-      batch_max_size = conf.batch_span_count,
-      process_delay  = conf.batch_flush_delay,
-    }
-
-    local err
-    q, err = BatchQueue.new("opentelemetry", process, opts)
-    if not q then
-      kong.log.err("could not create queue: ", err)
+  kong.tracing.process_span(function (span)
+    if span.should_sample == false or kong.ctx.plugin.should_sample == false then
+      -- ignore
       return
     end
-    queues[queue_id] = q
-  end
 
-  kong.tracing.process_span(process_span, q)
+    -- overwrite
+    local trace_id = kong.ctx.plugin.trace_id
+    if trace_id then
+      span.trace_id = trace_id
+    end
+
+    Queue.enqueue(
+      get_queue_params(conf),
+      http_export,
+      conf,
+      encode_span(span)
+    )
+  end)
 end
 
 return OpenTelemetryHandler
