@@ -145,26 +145,6 @@ function OpenTelemetryHandler:header_filter(conf)
   end
 end
 
-local function get_queue_params(config)
-  local queue_config = unpack({ config.queue or {}})
-  if config.batch_span_count and config.batch_span_count ~= ngx.null then
-    ngx.log(ngx.WARN, string.format(
-      "deprecated `batch_span_count` parameter in plugin %s converted to `queue.batch_max_size`",
-      kong.plugin.get_id()))
-    queue_config.batch_max_size = config.batch_span_count
-  end
-  if config.batch_flush_delay and config.batch_flush_delay ~= ngx.null then
-    ngx.log(ngx.WARN, string.format(
-      "deprecated `batch_flush_delay` parameter in plugin %s converted to `queue.max_delay`",
-      kong.plugin.get_id()))
-    queue_config.max_delay = config.batch_flush_delay
-  end
-  if not queue_config.name then
-    queue_config.name = kong.plugin.get_id()
-  end
-  return queue_config
-end
-
 function OpenTelemetryHandler:log(conf)
   ngx_log(ngx_DEBUG, _log_prefix, "total spans in current request: ", ngx.ctx.KONG_SPANS and #ngx.ctx.KONG_SPANS)
 
@@ -181,7 +161,7 @@ function OpenTelemetryHandler:log(conf)
     end
 
     Queue.enqueue(
-      get_queue_params(conf),
+      Queue.get_params(conf),
       http_export,
       conf,
       encode_span(span)
