@@ -123,7 +123,7 @@ function OpenTelemetryHandler:access()
   -- make propagation running with tracing instrumetation not enabled
   if not root_span then
     local tracer = kong.tracing.new("otel")
-    root_span = tracer.start_span("root")
+    root_span = tracer.start_span("kong.request")
 
     -- the span created only for the propagation and will be bypassed to the exporter
     kong.ctx.plugin.should_sample = false

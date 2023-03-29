@@ -41,9 +41,9 @@ function _M.db_query(connector)
   local f = connector.query
 
   local function wrap(self, sql, ...)
-    local span = tracer.start_span("query")
+    local span = tracer.start_span("kong.internal.database")
     span:set_attribute("db.system", kong.db and kong.db.strategy)
-    span:set_attribute("db.statement", sql)
+    span:set_attribute("db.statement", sql) -- resource
     -- raw query
     local ret = pack(f(self, sql, ...))
     -- ends span
@@ -58,7 +58,7 @@ end
 
 -- Record Router span
 function _M.router()
-  return tracer.start_span("router")
+  return tracer.start_span("kong.internal.router")
 end
 
 
@@ -77,10 +77,11 @@ function _M.balancer(ctx)
   local upstream_connect_time = split(var.upstream_connect_time, ", ", "jo")
   for i = 1, try_count do
     local try = balancer_tries[i]
-    span = tracer.start_span("balancer try #" .. i, {
+    span = tracer.start_span("kong.internal.balancer", {
       span_kind = 3, -- client
       start_time_ns = try.balancer_start * 1e6,
       attributes = {
+        ["try_count"] =  i,
         ["net.peer.ip"] = try.ip,
         ["net.peer.port"] = try.port,
       }
@@ -116,7 +117,7 @@ local function plugin_callback(phase)
     local plugin_name = plugin.name
     local name = name_memo[plugin_name]
     if not name then
-      name = phase .. " phase: " .. plugin_name
+      name = "kong.internal." .. phase .. ".plugin." .. plugin_name
       name_memo[plugin_name] = name
     end
 
@@ -151,8 +152,8 @@ function _M.http_client()
       attributes["http.proxy"] = http_proxy
     end
 
-    local span = tracer.start_span("HTTP " .. method .. " " .. uri, {
-      span_kind = 3,
+    local span = tracer.start_span("kong.internal.http_request", {
+      span_kind = 3, -- client
       attributes = attributes,
     })
 
@@ -181,12 +182,9 @@ _M.available_types = available_types
 
 -- Record inbound request
 function _M.request(ctx)
-  local req = kong.request
   local client = kong.client
 
   local method = get_method()
-  local path = req.get_path()
-  local span_name = method .. " " .. path
   local scheme = ctx.scheme or var.scheme
   local host = var.host
   -- passing full URI to http.url attribute
@@ -201,12 +199,12 @@ function _M.request(ctx)
     http_flavor = string.format("%.1f", http_flavor)
   end
 
-  local active_span = tracer.start_span(span_name, {
+  local active_span = tracer.start_span("kong.request", {
     span_kind = 2, -- server
     start_time_ns = start_time,
     attributes = {
-      ["http.method"] = method,
-      ["http.url"] = req_uri,
+      ["http.method"] = method, -- part of resource
+      ["http.url"] = req_uri, -- part of resource
       ["http.host"] = host,
       ["http.scheme"] = scheme,
       ["http.flavor"] = http_flavor,
@@ -222,19 +220,14 @@ local patch_dns_query
 do
   local raw_func
   local patch_callback
-  local name_memo = {}
 
   local function wrap(host, port)
-    local name = name_memo[host]
-    if not name then
-      name = "DNS: " .. host
-      name_memo[host] = name
-    end
-
-    local span = tracer.start_span(name)
+    local span = tracer.start_span("kong.internal.dns", {
+      span_kind = 3, -- client
+    })
     local ip_addr, res_port, try_list = raw_func(host, port)
     if span then
-      span:set_attribute("dns.record.domain", host)
+      span:set_attribute("dns.record.domain", host) -- resource
       span:set_attribute("dns.record.port", port)
       span:set_attribute("dns.record.ip", ip_addr)
       span:finish()
