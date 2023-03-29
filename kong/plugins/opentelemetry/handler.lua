@@ -147,13 +147,13 @@ end
 
 local function get_queue_params(config)
   local queue_config = unpack({ config.queue or {}})
-  if config.batch_span_count then
+  if config.batch_span_count and config.batch_span_count ~= ngx.null then
     ngx.log(ngx.WARN, string.format(
       "deprecated `batch_span_count` parameter in plugin %s converted to `queue.batch_max_size`",
       kong.plugin.get_id()))
     queue_config.batch_max_size = config.batch_span_count
   end
-  if config.batch_flush_delay then
+  if config.batch_flush_delay and config.batch_flush_delay ~= ngx.null then
     ngx.log(ngx.WARN, string.format(
       "deprecated `batch_flush_delay` parameter in plugin %s converted to `queue.max_delay`",
       kong.plugin.get_id()))
