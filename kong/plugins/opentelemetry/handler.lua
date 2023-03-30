@@ -8,9 +8,6 @@ local pairs = pairs
 
 local ngx = ngx
 local kong = kong
-local ngx_log = ngx.log
-local ngx_ERR = ngx.ERR
-local ngx_DEBUG = ngx.DEBUG
 local ngx_now = ngx.now
 local ngx_update_time = ngx.update_time
 local ngx_req = ngx.req
@@ -87,11 +84,11 @@ local function http_export(conf, spans)
 
   ngx_update_time()
   local duration = ngx_now() - start
-  ngx_log(ngx_DEBUG, _log_prefix, "exporter sent " .. #spans ..
+  kong.log.debug(_log_prefix, "exporter sent " .. #spans ..
     " traces to " .. conf.endpoint .. " in " .. duration .. " seconds")
 
   if not ok then
-    ngx_log(ngx_ERR, _log_prefix, err)
+    kong.log.err(_log_prefix, err)
   end
 
   return ok, err
@@ -146,7 +143,7 @@ function OpenTelemetryHandler:header_filter(conf)
 end
 
 function OpenTelemetryHandler:log(conf)
-  ngx_log(ngx_DEBUG, _log_prefix, "total spans in current request: ", ngx.ctx.KONG_SPANS and #ngx.ctx.KONG_SPANS)
+  kong.log.debug(_log_prefix, "total spans in current request: ", ngx.ctx.KONG_SPANS and #ngx.ctx.KONG_SPANS)
 
   kong.tracing.process_span(function (span)
     if span.should_sample == false or kong.ctx.plugin.should_sample == false then
