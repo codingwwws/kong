@@ -84,6 +84,14 @@
   parsed by default can now be configured with a new configuration parameters:
   `lua_max_req_headers`, `lua_max_resp_headers`, `lua_max_uri_args` and `lua_max_post_args`
   [#10443](https://github.com/Kong/kong/pull/10443)
+- Allow configuring Labels for data planes to provide metadata information.
+  Labels are only compatible with hybrid mode deployments with Kong Konnect (SaaS)
+  [#10471](https://github.com/Kong/kong/pull/10471)
+- Add Postgres triggers on the core entites and entities in bundled plugins to delete the
+  expired rows in an efficient and timely manner.
+  [#10389](https://github.com/Kong/kong/pull/10389)
+- Support for configurable Node IDs
+  [#10385](https://github.com/Kong/kong/pull/10385)
 
 #### Admin API
 
@@ -102,8 +110,13 @@
 - **HTTP-Log**: add `application/json; charset=utf-8` option for the `Content-Type` header
   in the http-log plugin, for log collectors that require that character set declaration.
   [#10533](https://github.com/Kong/kong/pull/10533)
+- **DataDog**: supports value of `host` to be referenceable.
+  [#10484](https://github.com/Kong/kong/pull/10484)
 - **Zipkin&Opentelemetry**: convert traceid in http response headers to hex format
   [#10534](https://github.com/Kong/kong/pull/10534)
+- **ACME**: acme plugin now supports configuring `namespace` for redis storage
+  which is default to empty string for backward compatibility.
+  [#10562](https://github.com/Kong/kong/pull/10562)
 
 #### PDK
 
@@ -146,6 +159,11 @@
   be proxied with incorrect query parameters.
   [10539](https://github.com/Kong/kong/pull/10539)
 
+#### PDK
+
+- Fixed an issue for tracing PDK where sample rate does not work.
+  [#10485](https://github.com/Kong/kong/pull/10485)
+
 ### Changed
 
 #### Core
@@ -154,6 +172,11 @@
   [#10405](https://github.com/Kong/kong/pull/10405)
 - Postgres TTL cleanup timer now runs a batch delete loop on each ttl enabled table with a number of 50.000 rows per batch.
   [#10407](https://github.com/Kong/kong/pull/10407)
+- Postgres TTL cleanup timer now runs every 5 minutes instead of every 60 seconds.
+  [#10389](https://github.com/Kong/kong/pull/10389)
+- Postgres TTL cleanup timer now deletes expired rows based on database server-side timestamp to avoid potential
+  problems caused by the difference of clock time between Kong and database server.
+  [#10389](https://github.com/Kong/kong/pull/10389)
 
 #### PDK
 
@@ -184,6 +207,8 @@
   [#10547](https://github.com/Kong/kong/pull/10547)
 - Bumped LuaSec from 1.2.0 to 1.3.1
   [#10528](https://github.com/Kong/kong/pull/10528)
+- Bumped lua-resty-acme from 0.10.1 to 0.11.0
+  [#10562](https://github.com/Kong/kong/pull/10562)
 
 ## 3.2.0
 
@@ -257,9 +282,11 @@
 
 #### Admin API
 
-- In dbless mode, `/config` API endpoint can now flatten all schema validation
-  errors to a single array via the optional `flatten_errors` query parameter.
+- In dbless mode, `/config` API endpoint can now flatten entity-related schema
+  validation errors to a single array via the optional `flatten_errors` query
+  parameter. Non-entity errors remain unchanged in this mode.
   [#10161](https://github.com/Kong/kong/pull/10161)
+  [#10256](https://github.com/Kong/kong/pull/10256)
 
 #### PDK
 
