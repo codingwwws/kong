@@ -102,7 +102,7 @@ for _, strategy in helpers.each_strategy() do
           expected_span_num = 4
         end
         assert.is_same(expected_span_num, #spans, res)
-        assert.is_same("kong.internal.database", spans[2].name)
+        assert.is_same("kong.internal.database.query", spans[2].name)
       end)
     end)
 
@@ -160,7 +160,7 @@ for _, strategy in helpers.each_strategy() do
         -- Making sure it's alright
         local spans = cjson.decode(res)
         assert.is_same(4, #spans, res)
-        assert.is_same("kong.internal.proxy", spans[1].name)
+        assert.is_same("kong.request", spans[1].name)
       end)
     end)
 
