@@ -41,7 +41,7 @@ function _M.db_query(connector)
   local f = connector.query
 
   local function wrap(self, sql, ...)
-    local span = tracer.start_span("kong.internal.database.query")
+    local span = tracer.start_span("kong.database.query")
     span:set_attribute("db.system", kong.db and kong.db.strategy)
     span:set_attribute("db.statement", sql) -- resource
     -- raw query
@@ -58,7 +58,7 @@ end
 
 -- Record Router span
 function _M.router()
-  return tracer.start_span("kong.internal.router")
+  return tracer.start_span("kong.router")
 end
 
 
@@ -77,7 +77,7 @@ function _M.balancer(ctx)
   local upstream_connect_time = split(var.upstream_connect_time, ", ", "jo")
   for i = 1, try_count do
     local try = balancer_tries[i]
-    span = tracer.start_span("kong.internal.balancer", {
+    span = tracer.start_span("kong.balancer", {
       span_kind = 3, -- client
       start_time_ns = try.balancer_start * 1e6,
       attributes = {
@@ -117,7 +117,7 @@ local function plugin_callback(phase)
     local plugin_name = plugin.name
     local name = name_memo[plugin_name]
     if not name then
-      name = "kong.internal." .. phase .. ".plugin." .. plugin_name
+      name = "kong." .. phase .. ".plugin." .. plugin_name
       name_memo[plugin_name] = name
     end
 
@@ -152,7 +152,7 @@ function _M.http_client()
       attributes["http.proxy"] = http_proxy
     end
 
-    local span = tracer.start_span("kong.internal.http_request", {
+    local span = tracer.start_span("kong.internal.request", {
       span_kind = 3, -- client
       attributes = attributes,
     })
@@ -222,7 +222,7 @@ do
   local patch_callback
 
   local function wrap(host, port)
-    local span = tracer.start_span("kong.internal.dns", {
+    local span = tracer.start_span("kong.dns", {
       span_kind = 3, -- client
     })
     local ip_addr, res_port, try_list = raw_func(host, port)
