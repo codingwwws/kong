@@ -1,0 +1,42 @@
+name: Build WASM Test Filters
+
+inputs:
+  fixture-path:
+    type: string
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Restore Cache
+      uses: actions/cache@v3
+      id: toolchain-cache
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ${{ inputs.fixture-path }}/target
+        key: v1::${{ runner.os }}-cargo-proxy-wasm-filters
+
+    - name: Install Rust Toolchain
+      if: ${{ steps.toolchain-cache.cache-hit != 'true' }}
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: cargo
+        target: wasm32-wasi
+
+    - name: cargo build
+      if: ${{ inputs.build }}
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: >
+          --manifest-path "${{ inputs.fixture-path }}/Cargo.toml"
+          --workspace
+          --lib
+          --target wasm32-wasi
