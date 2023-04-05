@@ -306,7 +306,7 @@ end
 
 -- split routes into one route per path to ensure that the priority is correctly
 -- calculated.
-local function split_route_by_path_class(route)
+local function split_route_by_path(route)
   if is_empty_field(route.route.paths) or #route.route.paths == 1 then
     return List({route})
   end
@@ -331,7 +331,7 @@ function _M.new(routes, cache, cache_neg, old_router)
 
   local split_routes = List()
   for _, route in ipairs(routes) do
-    split_routes = split_routes .. split_route_by_path_class(route)
+    split_routes = split_routes .. split_route_by_path(route)
   end
 
   return atc.new(split_routes, cache, cache_neg, old_router, get_exp_and_priority)
