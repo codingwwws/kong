@@ -250,6 +250,11 @@ jobs:
           sleep 2
           docker logs opentelemetry-collector
 
+    - name: Build WASM Test Filters
+      uses: ./.github/actions/build-wasm-test-filters
+      with:
+        fixture-path: ./spec/fixtures/proxy_wasm_filters
+
     - name: Tests
       run: |
           eval `luarocks path`
@@ -313,11 +318,6 @@ jobs:
               --config=/etc/otel-collector-config.yaml
           sleep 2
           docker logs opentelemetry-collector
-
-    - name: Build WASM Test Filters
-      uses: ./.github/actions/build-wasm-test-filters
-      with:
-        fixture-path: ./spec/fixtures/proxy_wasm_filters
 
     - name: Tests
       run: |

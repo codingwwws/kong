@@ -31,7 +31,6 @@ runs:
         target: wasm32-wasi
 
     - name: cargo build
-      if: ${{ inputs.build }}
       uses: actions-rs/cargo@v1
       with:
         command: build
