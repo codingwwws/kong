@@ -7,7 +7,6 @@ local tb_new = require("table.new")
 local tb_clear = require("table.clear")
 local tb_nkeys = require("table.nkeys")
 local tablex = require("pl.tablex")
-local List = require("pl.List")
 local uuid = require 'resty.jit-uuid'
 
 local escape_str      = atc.escape_str
@@ -309,19 +308,23 @@ local function group_by(t, f)
   local result = {}
   for _, value in ipairs(t) do
     local key = f(value)
-    result[key] = (result[key] or List()):append(value)
+    if result[key] then
+      result[key][#result[key] + 1] = value
+    else
+      result[key] = {value}
+    end
   end
   return result
 end
 
 -- split routes into multiple routes, one for each prefix length and one for all
 -- regular expressions
-local function split_route_by_path(rs)
+local function split_route_by_path_into(rs, split_rs)
   if is_empty_field(rs.route.paths) or #rs.route.paths == 1 then
-    return List({ rs })
+    split_rs[#split_rs + 1] = rs
+    return
   end
 
-  local routes = List()
   assert(rs.route.paths)
   local grouped_paths = group_by(
     rs.route.paths,
@@ -334,9 +337,8 @@ local function split_route_by_path(rs)
     cloned_route.route.original_route = rs.route
     cloned_route.route.paths = paths
     cloned_route.route.id = uuid.generate_v4()
-    routes:append(cloned_route)
+    split_rs[#split_rs + 1] = cloned_route
   end
-  return routes
 end
 
 
@@ -346,9 +348,9 @@ function _M.new(rs, cache, cache_neg, old_router)
     return error("expected arg #1 routes to be a table")
   end
 
-  local split_rs = List()
+  local split_rs = {}
   for _, route in ipairs(rs) do
-    split_rs = split_rs .. split_route_by_path(route)
+    split_route_by_path_into(route, split_rs)
   end
 
   return atc.new(split_rs, cache, cache_neg, old_router, get_exp_and_priority)
