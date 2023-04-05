@@ -77,7 +77,7 @@ local function get_expression(route)
     tb_insert(out, gen)
   end
 
-  local gen = gen_for_field("tls.sni", OP_EQUAL, snis, function(op, p)
+  gen = gen_for_field("tls.sni", OP_EQUAL, snis, function(_, p)
     if #p > 1 and byte(p, -1) == DOT then
       -- last dot in FQDNs must not be used for routing
       return p:sub(1, -2)
@@ -131,7 +131,7 @@ local function get_expression(route)
     end)
   end
 
-  local gen = gen_for_field("http.path", function(path)
+  gen = gen_for_field("http.path", function(path)
     return is_regex_magic(path) and OP_REGEX or OP_PREFIX
   end, paths, function(op, p)
     if op == OP_REGEX then
@@ -275,8 +275,9 @@ local function get_priority(route)
     end
   end
 
-  local match_weight   = lshift_uint64(match_weight, 61)
-  local headers_count  = lshift_uint64(headers_count, 52)
+  match_weight   = lshift_uint64(match_weight, 61)
+  headers_count  = lshift_uint64(headers_count, 52)
+
   local regex_priority = lshift_uint64(regex_url and route.regex_priority or 0, 19)
   local max_length     = band(uri_length, 0x7FFFF)
 
