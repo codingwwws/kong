@@ -6,7 +6,9 @@ local atc = require("kong.router.atc")
 local tb_new = require("table.new")
 local tb_clear = require("table.clear")
 local tb_nkeys = require("table.nkeys")
-
+local tablex = require("pl.tablex")
+local List = require("pl.List")
+local uuid = require 'resty.jit-uuid'
 
 local escape_str      = atc.escape_str
 local is_empty_field  = atc.is_empty_field
@@ -21,7 +23,6 @@ local tb_concat = table.concat
 local tb_insert = table.insert
 local tb_sort = table.sort
 local byte = string.byte
-local max = math.max
 local bor, band, lshift = bit.bor, bit.band, bit.lshift
 
 
@@ -30,6 +31,8 @@ local ngx_log   = ngx.log
 local ngx_WARN  = ngx.WARN
 local ngx_ERR   = ngx.ERR
 
+
+local uuid_factory = assert(uuid.factory_v5("4dcfc649-769a-4e66-82a8-c11fca6cfdff"))
 
 local DOT              = byte(".")
 local TILDE            = byte("~")
@@ -249,19 +252,25 @@ local function get_priority(route)
     end
   end
 
-  local max_uri_length = 0
+  local uri_length = 0
   local regex_url = false
 
   if not is_empty_field(paths) then
     match_weight = match_weight + 1
 
-    for _, p in ipairs(paths) do
-      if is_regex_magic(p) then
-        regex_url = true
-
+    for index, p in ipairs(paths) do
+      if index == 1 then
+        if is_regex_magic(p) then
+          regex_url = true
+        else
+          uri_length = #p
+        end
       else
-        -- plain URI or URI prefix
-        max_uri_length = max(max_uri_length, #p)
+        if regex_url then
+          assert(is_regex_magic(p), "cannot mix regex and non-regex routes in get_priority")
+        else
+          assert(#p == uri_length, "cannot mix different length prefixes in get_priority")
+        end
       end
     end
   end
@@ -269,7 +278,7 @@ local function get_priority(route)
   local match_weight   = lshift_uint64(match_weight, 61)
   local headers_count  = lshift_uint64(headers_count, 52)
   local regex_priority = lshift_uint64(regex_url and route.regex_priority or 0, 19)
-  local max_length     = band(max_uri_length, 0x7FFFF)
+  local max_length     = band(uri_length, 0x7FFFF)
 
   local priority = bor(match_weight,
                        plain_host_only and PLAIN_HOST_ONLY_BIT or 0,
@@ -295,8 +304,37 @@ local function get_exp_and_priority(route)
 end
 
 
+-- split routes into one route per path to ensure that the priority is correctly
+-- calculated.
+local function split_route_by_path_class(route)
+  if is_empty_field(route.route.paths) or #route.route.paths == 1 then
+    return List({route})
+  end
+
+  local routes = List()
+  assert(route.route.paths)
+  for index, path in ipairs(route.route.paths) do
+    local cloned_route = tablex.deepcopy(route)
+    cloned_route.original_route = route
+    cloned_route.route.paths = {path}
+    cloned_route.route.id = uuid_factory(route.route.id .. "." .. index)
+    routes:append(cloned_route)
+  end
+  return routes
+end
+
+
 function _M.new(routes, cache, cache_neg, old_router)
-  return atc.new(routes, cache, cache_neg, old_router, get_exp_and_priority)
+  if type(routes) ~= "table" then
+    return error("expected arg #1 routes to be a table")
+  end
+
+  local split_routes = List()
+  for _, route in ipairs(routes) do
+    split_routes = split_routes .. split_route_by_path_class(route)
+  end
+
+  return atc.new(split_routes, cache, cache_neg, old_router, get_exp_and_priority)
 end
 
 
