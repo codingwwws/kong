@@ -32,8 +32,6 @@ local ngx_WARN  = ngx.WARN
 local ngx_ERR   = ngx.ERR
 
 
-local uuid_factory = assert(uuid.factory_v5("4dcfc649-769a-4e66-82a8-c11fca6cfdff"))
-
 local DOT              = byte(".")
 local TILDE            = byte("~")
 local ASTERISK         = byte("*")
@@ -305,8 +303,19 @@ local function get_exp_and_priority(route)
 end
 
 
--- split routes into one route per path to ensure that the priority is correctly
--- calculated.
+-- group array-like table t by the function f, returning a table mapping from
+-- the result of invoking f on one of the elements to the actual elements.
+local function group_by(t, f)
+  local result = {}
+  for _, value in ipairs(t) do
+    local key = f(value)
+    result[key] = (result[key] or List()):append(value)
+  end
+  return result
+end
+
+-- split routes into multiple routes, one for each prefix length and one for all
+-- regular expressions
 local function split_route_by_path(rs)
   if is_empty_field(rs.route.paths) or #rs.route.paths == 1 then
     return List({ rs })
@@ -314,11 +323,17 @@ local function split_route_by_path(rs)
 
   local routes = List()
   assert(rs.route.paths)
-  for index, path in ipairs(rs.route.paths) do
+  local grouped_paths = group_by(
+    rs.route.paths,
+    function(path)
+      return is_regex_magic(path) or #path
+    end
+  )
+  for _, paths in pairs(grouped_paths) do
     local cloned_route = tablex.deepcopy(rs)
     cloned_route.route.original_route = rs.route
-    cloned_route.route.paths = {path}
-    cloned_route.route.id = uuid_factory(rs.route.id .. "." .. index)
+    cloned_route.route.paths = paths
+    cloned_route.route.id = uuid.generate_v4()
     routes:append(cloned_route)
   end
   return routes

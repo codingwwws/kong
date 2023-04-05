@@ -4641,7 +4641,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
         use_case = {
           -- regex + prefix
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = {
@@ -4655,7 +4655,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
           },
           -- prefix
           {
-            service = service2,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
               paths = {
@@ -4689,7 +4689,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
         use_case = {
           -- regex + prefix
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = {
@@ -4703,7 +4703,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
           },
           -- prefix
           {
-            service = service2,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
               paths = {
