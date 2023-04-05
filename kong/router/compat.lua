@@ -7,7 +7,7 @@ local tb_new = require("table.new")
 local tb_clear = require("table.clear")
 local tb_nkeys = require("table.nkeys")
 local tablex = require("pl.tablex")
-local uuid = require 'resty.jit-uuid'
+local utils = require("kong.tools.utils")
 
 local escape_str      = atc.escape_str
 local is_empty_field  = atc.is_empty_field
@@ -336,7 +336,7 @@ local function split_route_by_path_into(rs, split_rs)
     local cloned_route = tablex.deepcopy(rs)
     cloned_route.route.original_route = rs.route
     cloned_route.route.paths = paths
-    cloned_route.route.id = uuid.generate_v4()
+    cloned_route.route.id = utils.uuid()
     split_rs[#split_rs + 1] = cloned_route
   end
 end
