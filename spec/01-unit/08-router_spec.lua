@@ -28,13 +28,8 @@ local function new_router(cases, old_router)
   return Router.new(cases, nil, nil, old_router)
 end
 
-local service1 = {
+local service = {
   name = "service-invalid",
-  protocol = "http",
-}
-
-local service2 = {
-  name = "service-invalid-2",
   protocol = "http",
 }
 
@@ -121,7 +116,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
           -- 1. host
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               hosts = {
@@ -132,7 +127,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 2. method
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
               methods = {
@@ -142,7 +137,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 3. uri
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               paths = {
@@ -152,7 +147,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 4. host + uri
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
               paths = {
@@ -166,7 +161,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 5. host + method
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8105",
               hosts = {
@@ -182,7 +177,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 6. uri + method
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8106",
               methods = {
@@ -197,7 +192,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 7. host + uri + method
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8107",
               hosts = {
@@ -225,7 +220,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 9. headers (single)
           {
-            service = service1,
+            service = service,
             route = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8109",
               headers = {
@@ -238,7 +233,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 10. headers (multiple)
           {
-            service = service1,
+            service = service,
             route = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8110",
               headers = {
@@ -254,7 +249,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 11. headers + uri
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8111",
               headers = {
@@ -270,7 +265,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 12. host + headers + uri + method
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8112",
               hosts = {
@@ -295,7 +290,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 13. host + port
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8113",
               hosts = {
@@ -306,7 +301,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 14. no "any-port" route
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8114",
               hosts = {
@@ -316,7 +311,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           },
           -- 15. headers (regex)
           {
-            service = service1,
+            service = service,
             route = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8115",
               headers = {
@@ -670,7 +665,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             use_case = {
               -- 1: no port, with and without brackets, unique IPs
               {
-                service = service1,
+                service = service,
                 route = {
                   hosts = { "::11", "[::12]" },
                 },
@@ -678,7 +673,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
               -- 2: no port, with and without brackets, same hosts as 4
               {
-                service = service1,
+                service = service,
                 route = {
                   hosts = { "::21", "[::22]" },
                 },
@@ -686,7 +681,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
               -- 3: unique IPs, with port
               {
-                service = service1,
+                service = service,
                 route = {
                   hosts = { "[::31]:321", "[::32]:321" },
                 },
@@ -694,7 +689,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
               -- 4: same hosts as 2, with port, needs brackets
               {
-                service = service1,
+                service = service,
                 route = {
                   hosts = { "[::21]:321", "[::22]:321" },
                 },
@@ -760,14 +755,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("does not supersede another route with a longer [uri]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { "/my-route/hello" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { "/my-route" },
@@ -809,7 +804,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("does not supersede another route with a longer [uri] while [methods] are also defined", function()
           local use_case = {
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 methods = { "POST", "PUT", "GET" },
@@ -817,7 +812,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 methods = { "POST", "PUT", "GET" },
@@ -848,7 +843,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("does not superseds another route with a longer [uri] while [hosts] are also defined", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "domain.org" },
@@ -856,7 +851,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "domain.org" },
@@ -887,7 +882,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("does not supersede another route with a longer [uri] when a better [uri] match exists for another [host]", function()
           local use_case = {
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts   = { "example.com" },
@@ -895,7 +890,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts   = { "example.com" },
@@ -903,7 +898,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 hosts   = { "example.net" },
@@ -926,14 +921,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("only matches [uri prefix] as a prefix (anchored mode)", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { "/something/my-route" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts  = { "example.com" },
@@ -958,7 +953,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches with [uri regex]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { [[~/users/\d+/profile]] },
@@ -982,21 +977,21 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches the right route when several ones have a [uri regex]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { [[~/route/persons/\d{3}]] },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { [[~/route/persons/\d{3}/following]] },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 paths = { [[~/route/persons/\d{3}/[a-z]+]] },
@@ -1014,14 +1009,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches a [uri regex] even if a [prefix uri] got a match", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { [[/route/persons]] },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { [[~/route/persons/\d+/profile]] },
@@ -1046,14 +1041,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches a [uri regex] even if a [uri] got an exact match", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { "/route/fixture" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { "~/route/(fixture)" },
@@ -1076,7 +1071,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches a [uri regex + host] even if a [prefix uri] got a match", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "route.com" },
@@ -1084,7 +1079,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "route.com" },
@@ -1093,7 +1088,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 hosts = { "route.com" },
@@ -1117,7 +1112,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches from the beginning of the request URI [uri regex]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { [[~/prefix/[0-9]+]] }
@@ -1145,14 +1140,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         lazy_setup(function()
           use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "*.route.com" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "route.*" },
@@ -1193,14 +1188,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
         it("matches port-specific routes", function()
           table.insert(use_case, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               hosts = { "*.route.net:123" },
             },
           })
           table.insert(use_case, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
               hosts = { "route.*:123" },    -- same as [2] but port-specific
@@ -1230,7 +1225,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
         it("prefers port-specific even for http default port", function()
           table.insert(use_case, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               hosts = { "route.*:80" },    -- same as [2] but port-specific
@@ -1260,7 +1255,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
         it("prefers port-specific even for https default port", function()
           table.insert(use_case, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               hosts = { "route.*:443" },    -- same as [2] but port-specific
@@ -1290,7 +1285,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
         it("does not take precedence over a plain host", function()
           table.insert(use_case, 1, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               hosts = { "plain.route.com" },
@@ -1298,7 +1293,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           })
 
           table.insert(use_case, {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
               hosts = { "route.com" },
@@ -1357,7 +1352,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches [wildcard host + path] even if a similar [plain host] exists", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "*.route.com" },
@@ -1365,7 +1360,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "plain.route.com" },
@@ -1390,7 +1385,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches [plain host + path] even if a matching [wildcard host] exists", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "*.route.com" },
@@ -1398,7 +1393,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "plain.route.com" },
@@ -1423,14 +1418,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("submatch_weight [wildcard host port] > [wildcard host] ", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "route.*" },
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "route.*:80", "route.com.*" },
@@ -1454,21 +1449,21 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches a [wildcard host + port] even if a [wildcard host] matched", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "route.*" },
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "route.*:123" },
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 hosts = { "route.*:80" },
@@ -1508,7 +1503,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           end)
 
           table.insert(use_case, {
-            service   = service1,
+            service   = service,
             route     = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               hosts   = { "*.domain.com", "example.com" },
@@ -1539,7 +1534,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "*.example.com" },
@@ -1547,7 +1542,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "*.example.com" },
@@ -1573,7 +1568,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("evaluates Routes with more [headers] first", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 headers = {
@@ -1583,7 +1578,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 headers = {
@@ -1610,7 +1605,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("names are case-insensitive", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 headers = {
@@ -1619,7 +1614,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 headers = {
@@ -1655,7 +1650,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches values in a case-insensitive way", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 headers = {
@@ -1664,7 +1659,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 headers = {
@@ -1703,7 +1698,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           local router
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { "/foo", },
@@ -1711,7 +1706,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { "/bar", },
@@ -1737,7 +1732,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           it("update/remove works", function()
             local use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   paths = { "/foo1", },
@@ -1761,7 +1756,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           it("update with wrong route", function()
             local use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   paths = { "~/delay/(?<delay>[^\\/]+)$", },
@@ -1780,7 +1775,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           it("update skips routes if updated_at is unchanged", function()
             local use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   paths = { "/foo", },
@@ -1788,7 +1783,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 },
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                   paths = { "/baz", },
@@ -1819,7 +1814,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
             local use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   paths = { "/foz", },
@@ -1827,7 +1822,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 },
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                   paths = { "/baz", },
@@ -1851,7 +1846,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           it("detects concurrent incremental builds", function()
             local use_cases = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   paths = { "/foz", },
@@ -1859,7 +1854,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 },
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                   paths = { "/baz", },
@@ -1871,7 +1866,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             -- needs to be larger than YIELD_ITERATIONS
             for i = 1, 2000 do
               use_cases[i] = {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb" .. string.format("%04d", i),
                   paths = { "/" .. i, },
@@ -2096,7 +2091,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           before_each(function()
             use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   methods = { "GET" },
@@ -2154,7 +2149,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           before_each(function()
             use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   methods = { "GET" },
@@ -2186,9 +2181,9 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
         lazy_setup(function()
           use_case = {
-            -- plain route
+            -- plain
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8100",
                 paths = {
@@ -2198,7 +2193,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- percent encoding with unreserved char, route should be plain text
             {
-              service = service2,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = {
@@ -2208,7 +2203,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- regex. It is no longer normalized since 3.0
             {
-              service = service2,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = {
@@ -2217,7 +2212,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service2,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 paths = {
@@ -2226,7 +2221,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service2,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
                 paths = {
@@ -2241,14 +2236,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("matches against plain text paths", function()
           local match_t = router:select("GET", "/plain/a.b.c", "example.com")
           assert.truthy(match_t)
-          assert.same(use_case[1].service, match_t.service)
+          assert.same(use_case[1].route, match_t.route)
 
           -- route no longer normalize user configured path
           match_t = router:select("GET", "/plain/a.b c", "example.com")
           assert.falsy(match_t)
           match_t = router:select("GET", "/plain/a.b%25c", "example.com")
           assert.truthy(match_t)
-          assert.same(use_case[2].service, match_t.service)
+          assert.same(use_case[2].route, match_t.route)
 
           match_t = router:select("GET", "/plain/aab.c", "example.com")
           assert.falsy(match_t)
@@ -2293,7 +2288,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           local use_case = {
             -- 1. host
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = {
@@ -2304,7 +2299,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 2. method
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 methods = {
@@ -2314,7 +2309,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 3. uri
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
                 paths = {
@@ -2324,7 +2319,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 4. host + uri
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
                 paths = {
@@ -2338,7 +2333,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 5. host + method
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8105",
                 hosts = {
@@ -2354,7 +2349,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 6. uri + method
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8106",
                 methods = {
@@ -2369,7 +2364,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
             -- 7. host + uri + method
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8107",
                 hosts = {
@@ -2401,7 +2396,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("half [uri] and [host] match does not supersede another route", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts = { "host1.com" },
@@ -2409,7 +2404,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "host2.com" },
@@ -2431,7 +2426,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("half [wildcard host] and [method] match does not supersede another route", function()
           local use_case = {
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 hosts   = { "host.*" },
@@ -2439,7 +2434,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts   = { "host.*" },
@@ -2461,7 +2456,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("half [uri regex] and [method] match does not supersede another route", function()
           local use_case = {
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 methods = { "GET" },
@@ -2469,7 +2464,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 methods = { "POST" },
@@ -2491,14 +2486,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("[method] does not supersede [uri prefix]", function()
           local use_case = {
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 methods = { "GET" },
               },
             },
             {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths   = { "/example" },
@@ -2519,14 +2514,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("[method] does not supersede [wildcard host]", function()
           local use_case = {
             {
-              service    = service1,
+              service    = service,
               route      = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 methods  = { "GET" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 hosts = { "domain.*" },
@@ -2547,14 +2542,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it_trad_only("does not supersede another route with a longer [uri prefix]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths = { "/a", "/bbbbbbb" },
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 paths = { "/a/bb" },
@@ -2572,7 +2567,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         describe("root / [uri]", function()
           lazy_setup(function()
             table.insert(use_case, 1, {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb810f",
                 paths = { "/" },
@@ -2621,7 +2616,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             -- [host + uri]
             for i = 1, n - 1 do
               table.insert(use_case, {
-                service = service1,
+                service = service,
                 route   = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb811" .. i,
                   hosts = { "domain.org" },
@@ -2631,7 +2626,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             end
 
             table.insert(use_case, {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8121",
                 hosts = { "domain.org" },
@@ -2657,7 +2652,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("more [headers] has priority over longer [paths]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 headers = {
@@ -2667,7 +2662,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
             },
             {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
                 headers = {
@@ -2781,7 +2776,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           lazy_setup(function()
             for i = 1, 10^5 do
               benchmark_use_cases[i] = {
-                service = service1,
+                service = service,
                 route   = {
                   id = "e8fb37f1-102d-461e-9c51-6608a1" .. string.format("%06d", i),
                   hosts = { "domain-" .. i .. ".org" },
@@ -2820,7 +2815,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               -- but have conflicting paths and hosts (domain-<n>.org)
 
               benchmark_use_cases[i] = {
-                service = service1,
+                service = service,
                 route   = {
                   id = "e8fb37f1-102d-461e-9c51-6608a1" .. string.format("%06d", i),
                   hosts = { "domain-" .. n .. ".org" },
@@ -2831,7 +2826,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
             -- insert our target route, which has the proper method as well
             benchmark_use_cases[n] = {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a1" .. string.format("%06d", n),
                 hosts   = { "domain-" .. n .. ".org" },
@@ -2869,7 +2864,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
               for i = 1, n do
                 benchmark_use_cases[i] = {
-                  service = service1,
+                  service = service,
                   route   = {
                     id = "e8fb37f1-102d-461e-9c51-6608a1" .. string.format("%06d", i),
                     headers = {
@@ -2911,7 +2906,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
                 for i = 1, n do
                   benchmark_use_cases[i] = {
-                    service = service1,
+                    service = service,
                     route   = {
                       id = "e8fb37f1-102d-461e-9c51-6608a1" .. string.format("%06d", i),
                       headers = {
@@ -2957,7 +2952,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               -- all our routes here use domain.org as the domain
               -- they all are [host + uri] category
               benchmark_use_cases[i] = {
-                service = service1,
+                service = service,
                 route   = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6" .. string.format("%06d", i),
                   hosts = { "domain.org" },
@@ -2969,7 +2964,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             -- this one too, but our target will be a
             -- different URI
             benchmark_use_cases[n] = {
-              service = service1,
+              service = service,
               route   = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6ffffff",
                 hosts = { "domain.org" },
@@ -3009,7 +3004,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               -- insert a lot of routes that don't match (missing methods)
               -- but have conflicting paths and hosts (domain-<n>.org)
               benchmark_use_cases[i] = {
-                service = service1,
+                service = service,
                 route   = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6" .. string.format("%06d", i),
                   hosts = { "domain-" .. n .. ".org" },
@@ -3023,7 +3018,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
             -- insert our target route, which has the proper method as well
             benchmark_use_cases[n] = {
-              service   = service1,
+              service   = service,
               route     = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6ffffff",
                 hosts   = { "domain-" .. n .. ".org" },
@@ -3207,7 +3202,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("returns matched_host + matched_uri + matched_method + matched_headers", function()
         local use_case_routes = {
           {
-            service   = service1,
+            service   = service,
             route     = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               hosts   = { "host.com" },
@@ -3216,7 +3211,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
           },
           {
-            service   = service1,
+            service   = service,
             route     = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
               hosts   = { "host.com" },
@@ -3224,7 +3219,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
           },
           {
-            service   = service1,
+            service   = service,
             route     = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
               hosts   = { "*.host.com" },
@@ -3234,7 +3229,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             },
           },
           {
-            service   = service1,
+            service   = service,
             route     = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8104",
               paths   = { [[~/users/\d+/profile]] },
@@ -3315,7 +3310,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("returns uri_captures from a [uri regex]", function()
         local use_case = {
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = { [[~/users/(?P<user_id>\d+)/profile/?(?P<scope>[a-z]*)]] },
@@ -3369,7 +3364,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("returns uri_captures normalized, fix #7913", function()
         local use_case = {
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = { [[~/users/(?P<fullname>[a-zA-Z\s\d%]+)/profile/?(?P<scope>[a-z]*)]] },
@@ -3409,7 +3404,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("returns no uri_captures from a [uri prefix] match", function()
         local use_case = {
           {
-            service      = service1,
+            service      = service,
             route        = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths      = { "/hello" },
@@ -3429,7 +3424,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("returns no uri_captures from a [uri regex] match without groups", function()
         local use_case = {
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = { [[~/users/\d+/profile]] },
@@ -3515,7 +3510,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
       it("allows url encoded paths if they are reserved characters", function()
         local use_case_routes = {
           {
-            service = service1,
+            service = service,
             route   = {
               id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
               paths = { "/endel%2Fst" },
@@ -3535,20 +3530,20 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         local router
         local use_case_routes = {
           {
-            service      = service1,
+            service      = service,
             route        = {
               id         = uuid(),
-              paths      = { "/my-route", "/xx-route" }, -- must have equal prefix lengths to accommodate get_priority
+              paths      = { "/my-route", "/xx-route" }, -- need to have same length for get_priority to work
               strip_path = true
             }
           },
           -- don't strip this route's matching URI
           {
-            service      = service2,
+            service      = service,
             route        = {
               id         = uuid(),
               methods    = { "POST" },
-              paths      = { "/my-route", "/xx-route" }, -- must have equal prefix lengths to accommodate get_priority
+              paths      = { "/my-route", "/xx-route" }, -- need to have same length for get_priority to work
               strip_path = false,
             },
           },
@@ -3563,7 +3558,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                                 { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/hello/world", match_t.upstream_uri)
         end)
@@ -3572,7 +3567,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           local _ngx = mock_ngx("GET", "/my-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
         end)
@@ -3582,7 +3577,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                                 { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[2].service, match_t.service)
+          assert.same(use_case_routes[2].route, match_t.route)
           assert.is_nil(match_t.prefix)
           assert.equal("/my-route/hello/world", match_t.upstream_uri)
         end)
@@ -3592,15 +3587,15 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                                 { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[2].service, match_t.service)
+          assert.same(use_case_routes[2].route, match_t.route)
           assert.is_nil(match_t.prefix)
           assert.equal("/my-route/hello/world", match_t.upstream_uri)
         end)
 
-        it("does not strip root / URI", function()
+        it("does not strips root / URI", function()
           local use_case_routes = {
             {
-              service      = service1,
+              service      = service,
               route        = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths      = { "/" },
@@ -3624,14 +3619,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           local _ngx = mock_ngx("GET", "/my-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
 
           _ngx = mock_ngx("GET", "/my-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
         end)
@@ -3640,28 +3635,28 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           local _ngx = mock_ngx("GET", "/my-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           local match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
 
           _ngx = mock_ngx("GET", "/xx-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/xx-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
 
           _ngx = mock_ngx("GET", "/my-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/my-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
 
           _ngx = mock_ngx("GET", "/xx-route", { host = "domain.org" })
           router._set_ngx(_ngx)
           match_t = router:exec()
-          assert.same(use_case_routes[1].service, match_t.service)
+          assert.same(use_case_routes[1].route, match_t.route)
           assert.equal("/xx-route", match_t.prefix)
           assert.equal("/", match_t.upstream_uri)
         end)
@@ -3669,7 +3664,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("strips url encoded paths", function()
           local use_case_routes = {
             {
-              service      = service1,
+              service      = service,
               route        = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths      = { "/endel%2Fst" },
@@ -3690,7 +3685,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("strips a [uri regex]", function()
           local use_case = {
             {
-              service      = service1,
+              service      = service,
               route        = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths      = { [[~/users/\d+/profile]] },
@@ -3711,7 +3706,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("strips a [uri regex] with a capture group", function()
           local use_case = {
             {
-              service      = service1,
+              service      = service,
               route        = {
                 id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                 paths      = { [[~/users/(\d+)/profile]] },
@@ -3795,7 +3790,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           it("uses the request's Host header when `grab_header` is disabled", function()
             local use_case_routes = {
               {
-                service         = service1,
+                service         = service,
                 route           = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   name          = "route-1",
@@ -3823,7 +3818,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
 
             local use_case_routes = {
               {
-                service         = service1,
+                service         = service,
                 route           = {
                   id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
                   name          = "no-host",
@@ -4219,7 +4214,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             use_case = {
               -- plain
               {
-                service = service1,
+                service = service,
                 route = {
                   sources = {
                     { ip = "127.0.0.1" },
@@ -4228,7 +4223,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 }
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   sources = {
                     { port = 65001 },
@@ -4238,7 +4233,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
               -- range
               {
-                service = service1,
+                service = service,
                 route = {
                   sources = {
                     { ip = "127.168.0.0/8" },
@@ -4247,7 +4242,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
               -- ip + port
               {
-                service = service1,
+                service = service,
                 route = {
                   sources = {
                     { ip = "127.0.0.1", port = 65001 },
@@ -4255,7 +4250,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 }
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   sources = {
                     { ip = "127.0.0.2", port = 65300 },
@@ -4319,7 +4314,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             use_case = {
               -- plain
               {
-                service = service1,
+                service = service,
                 route = {
                   destinations = {
                     { ip = "127.0.0.1" },
@@ -4328,7 +4323,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 }
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   destinations = {
                     { port = 65001 },
@@ -4338,7 +4333,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
               -- range
               {
-                service = service1,
+                service = service,
                 route = {
                   destinations = {
                     { ip = "127.168.0.0/8" },
@@ -4347,7 +4342,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               },
               -- ip + port
               {
-                service = service1,
+                service = service,
                 route = {
                   destinations = {
                     { ip = "127.0.0.1", port = 65001 },
@@ -4355,7 +4350,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 }
               },
               {
-                service = service1,
+                service = service,
                 route = {
                   destinations = {
                     { ip = "127.0.0.2", port = 65300 },
@@ -4426,14 +4421,14 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
           lazy_setup(function()
             use_case = {
               {
-                service = service1,
+                service = service,
                 route = {
                   snis = { "www.example.org" }
                 }
               },
               -- see #6425
               {
-                service = service1,
+                service = service,
                 route   = {
                   hosts = {
                     "sni.example.com",
@@ -4447,7 +4442,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
                 },
               },
               {
-                service = service1,
+                service = service,
                 route   = {
                   hosts = {
                     "sni.example.com",
@@ -4462,7 +4457,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
             use_case_ignore_sni = {
               -- see #6425
               {
-                service = service1,
+                service = service,
                 route   = {
                   hosts = {
                     "sni.example.com",
@@ -4507,13 +4502,13 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("[sni] has higher priority than [src] or [dst]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 snis = { "www.example.org" },
               }
             },
             {
-              service = service1,
+              service = service,
               route = {
                 sources = {
                   { ip = "127.0.0.1" },
@@ -4521,7 +4516,7 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
               }
             },
             {
-              service = service1,
+              service = service,
               route = {
                 destinations = {
                   { ip = "172.168.0.1" },
@@ -4546,13 +4541,13 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible", "expressions"
         it("[src] + [dst] has higher priority than [sni]", function()
           local use_case = {
             {
-              service = service1,
+              service = service,
               route = {
                 snis = { "www.example.org" },
               }
             },
             {
-              service = service1,
+              service = service,
               route = {
                 sources = {
                   { ip = "127.0.0.1" },
@@ -4584,11 +4579,11 @@ describe("[both regex and prefix with regex_priority]", function()
     use_case = {
       -- regex
       {
-        service = service1,
+        service = service,
         route   = {
           id = "e8fb37f1-102d-461e-9c51-6608a6bb8101",
           paths = {
-            "~/.*"
+            "/.*"
           },
           hosts = {
             "domain-1.org",
@@ -4597,7 +4592,7 @@ describe("[both regex and prefix with regex_priority]", function()
       },
       -- prefix
       {
-        service = service1,
+        service = service,
         route   = {
           id = "e8fb37f1-102d-461e-9c51-6608a6bb8102",
           paths = {
@@ -4610,7 +4605,7 @@ describe("[both regex and prefix with regex_priority]", function()
         },
       },
       {
-        service = service1,
+        service = service,
         route   = {
           id = "e8fb37f1-102d-461e-9c51-6608a6bb8103",
           paths = {
@@ -4679,10 +4674,10 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
       it("[assigns different priorities to regex and non-regex path]", function()
         local match_t = router:select("GET", "/some/thing/else", "domain-1.org")
         assert.truthy(match_t)
-        assert.same(use_case[1].service, match_t.service)
+        assert.same(use_case[1].route, match_t.route)
         local match_t = router:select("GET", "/foo/bar", "domain-1.org")
         assert.truthy(match_t)
-        assert.same(use_case[2].service, match_t.service)
+        assert.same(use_case[2].route, match_t.route)
       end)
 
     end)
@@ -4727,10 +4722,10 @@ for _, flavor in ipairs({ "traditional", "traditional_compatible" }) do
       it("[assigns different priorities to each path]", function()
         local match_t = router:select("GET", "/foo", "domain-1.org")
         assert.truthy(match_t)
-        assert.same(use_case[1].service, match_t.service)
+        assert.same(use_case[1].route, match_t.route)
         local match_t = router:select("GET", "/foo/bar", "domain-1.org")
         assert.truthy(match_t)
-        assert.same(use_case[2].service, match_t.service)
+        assert.same(use_case[2].route, match_t.route)
       end)
 
     end)

@@ -307,35 +307,36 @@ end
 
 -- split routes into one route per path to ensure that the priority is correctly
 -- calculated.
-local function split_route_by_path(route)
-  if is_empty_field(route.route.paths) or #route.route.paths == 1 then
-    return List({route})
+local function split_route_by_path(rs)
+  if is_empty_field(rs.route.paths) or #rs.route.paths == 1 then
+    return List({ rs })
   end
 
   local routes = List()
-  assert(route.route.paths)
-  for index, path in ipairs(route.route.paths) do
-    local cloned_route = tablex.deepcopy(route)
-    cloned_route.original_route = route
+  assert(rs.route.paths)
+  for index, path in ipairs(rs.route.paths) do
+    local cloned_route = tablex.deepcopy(rs)
+    cloned_route.route.original_route = rs.route
     cloned_route.route.paths = {path}
-    cloned_route.route.id = uuid_factory(route.route.id .. "." .. index)
+    cloned_route.route.id = uuid_factory(rs.route.id .. "." .. index)
     routes:append(cloned_route)
   end
   return routes
 end
 
 
-function _M.new(routes, cache, cache_neg, old_router)
-  if type(routes) ~= "table" then
+function _M.new(rs, cache, cache_neg, old_router)
+  -- rs argument is a table with [route] and [service], hence rs
+  if type(rs) ~= "table" then
     return error("expected arg #1 routes to be a table")
   end
 
-  local split_routes = List()
-  for _, route in ipairs(routes) do
-    split_routes = split_routes .. split_route_by_path(route)
+  local split_rs = List()
+  for _, route in ipairs(rs) do
+    split_rs = split_rs .. split_route_by_path(route)
   end
 
-  return atc.new(split_routes, cache, cache_neg, old_router, get_exp_and_priority)
+  return atc.new(split_rs, cache, cache_neg, old_router, get_exp_and_priority)
 end
 
 
